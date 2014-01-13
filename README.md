@@ -17,12 +17,14 @@ mock.js的可视化编辑器
 
 ##todo
 
-json数据表单 比较复杂。。10%
+json数据表单 比较复杂。。10%  这个是以后的开发重点
 
-界面 90&
+界面 90& bootstrap+jsoneditor
 
-编辑，导出数据 100%
+编辑，导出数据 100% filesave api
 
-生成动态url 30% 未持久化
+生成动态url 100%  file-store库+connect搞定
+
+查看历史动态url与查看历史动态模板 0%  准备利用nw原生api搞定
 
 拖拽比对json数据  80% 未加样式

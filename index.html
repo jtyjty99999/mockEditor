@@ -73,7 +73,7 @@
 				<div class="btn-group btn-group-justified">
 				  <a class="btn btn-default" role="button" id="historyTpl">历史数据模板</a>
 				  <a class="btn btn-default" role="button" id="saveTpl">保存模板</a>
-				  <a class="btn btn-default" role="button" id="runJson">生成数据</a>
+				  <a class="btn btn-primary" role="button" id="runJson">生成数据</a>
 				  <a class="btn btn-default" role="button" id="clearTpl">清空</a>
 				</div>
 			  </div>
@@ -102,7 +102,7 @@
 				  <div id="jsoneditor" style="width: 100%; height: 400px;"></div>
 				  <div class="btn-group btn-group-justified">
 				  <a class="btn btn-default" role="button" id="export">导出json</a>
-				  <a class="btn btn-default" role="button" data-toggle="modal" data-target="#myModal">生成url</a>
+				  <a class="btn btn-default" role="button" data-toggle="modal" data-target="#myModal" id="createUrl">生成url</a>
 				  <a class="btn btn-default" role="button" id="formatJson">格式化</a>
 				  <a class="btn btn-default" role="button" id="clear">清空</a>
 				</div>
@@ -133,7 +133,6 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -146,16 +145,34 @@
 	<script type="text/javascript">
 	var connect = require('connect'), http = require('http'),routeMap = require('./router/index');
 
-	
+
+var ip = require('./config').ip;
 	
 	var app = connect(routeMap)
 		.use(connect.logger('dev'))
 		.use(connect.static('public'))
 		.use(function (req, res) {
+			ip = getClientIp(req);
 			res.end('hello world\n');
 		})
 
 		http.createServer(app).listen(3000);
+		
+	var FileStore = require("file-store")
+    , store = FileStore("dataStored.txt");
+
+	
+	function generateUrl(data) {
+		var urlId = Random.guid();
+		store.set(urlId, data, function (err) {
+			
+			var url =ip+':3000/requireData'+'?uuid='+urlId;
+			$('#generatedUrl').val(url)
+			
+			
+			
+		})
+	}
 	</script>
 
 	<script type="text/javascript" src="js/fileSaver.js"></script>
@@ -241,6 +258,13 @@
 	
 	})
 	
+	
+		$document.delegate('#createUrl','click',function(){
+	var data = editor.getText();
+	
+	generateUrl(data);
+	
+	})
 	
 	</script>
 	<script type="text/javascript" src="js/mock.js"></script>
