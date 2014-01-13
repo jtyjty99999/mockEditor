@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Bootstrap 101 Template</title>
+    <title>mockEditor1.0</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
@@ -9,7 +9,11 @@
 	
 	<style type="text/css">
 	
+	.container{
 	
+	margin-top:20px
+	
+	}
 	
 	
 	</style>
@@ -24,43 +28,6 @@
   <body>
   
       <div class="container">
-
-      <!-- Static navbar -->
-      <div class="navbar navbar-default" role="navigation">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Project name</a>
-        </div>
-        <div class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li><a href="#">Link</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-            </li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li class="active"><a href="./">Default</a></li>
-            <li><a href="../navbar-static-top/">Static top</a></li>
-            <li><a href="../navbar-fixed-top/">Fixed top</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
 	  
 	  
 	<div class="row">
@@ -101,7 +68,15 @@
 				  </div>
 			  
 			  </div>
-			  <div class="tab-pane" id="json">...</div>
+			  <div class="tab-pane" id="json">
+			  <div id="sourceEditor" style="width:100%;height:400px"></div>
+				<div class="btn-group btn-group-justified">
+				  <a class="btn btn-default" role="button" id="historyTpl">历史数据模板</a>
+				  <a class="btn btn-default" role="button" id="saveTpl">保存模板</a>
+				  <a class="btn btn-default" role="button" id="runJson">生成数据</a>
+				  <a class="btn btn-default" role="button" id="clearTpl">清空</a>
+				</div>
+			  </div>
 			  <div class="tab-pane" id="compare">
 			  
 			  <div class="row">
@@ -268,6 +243,59 @@
 	
 	
 	</script>
+	<script type="text/javascript" src="js/mock.js"></script>
+	<script type="text/javascript">
+	
+	function handle(instance, changeObj) {
+                var tpl;
+                try {
+                    tpl = instance.getText()
+                    tpl = tpl.replace(/^([\r\n]*)/i, '')
+                        .replace(/([\r\n]*$)/i, '')
+                    if (/^\s*[\[\{\(]/.test(tpl)) {
+                        tpl = new Function('return ' + instance.getText());
+                        tpl = tpl()
+                    }
+                } catch (error) {
+                    console.error(error.stack);
+                    tpl = error.toString()
+                }
+                var data = Mock.mock(tpl)
+                editor.set(data);
+                return handle
+            }
+	
+	var sourceContainer = document.getElementById("sourceEditor");
+    var sourceEditor = new jsoneditor.JSONEditor(sourceContainer);
+	sourceEditor.setMode('code');
+    
+	
+	$document.delegate('#runJson','click',function(){
+	
+		handle(sourceEditor);
+	
+	})
+	
+	$document.delegate('#clearTpl','click',function(){
+	
+		 if(confirm("确定要清空数据模板吗？")){
+			sourceEditor.setText('');
+		 }
+	
+	})
+	
+	
+	function generateSingleData(type){
+	
+	
+	
+	
+	}
+	
+	
+	
+	</script>
+	
 	<script src="js/compare.js"></script>
 	<script type="text/javascript">
 	
