@@ -7,16 +7,7 @@
     <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/jsoneditor.css">
 	
-	<style type="text/css">
-	
-	.container{
-	
-	margin-top:20px
-	
-	}
-	
-	
-	</style>
+<link rel="stylesheet" href="css/main.css"/>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -39,15 +30,32 @@
 			  <div class="panel-footer">
 			  		<!-- Nav tabs -->
 			<ul class="nav nav-tabs">
-			  <li><a href="#randomData" data-toggle="tab">生成随机数据</a></li>
 			  <li><a href="#json" data-toggle="tab">生成json数据</a></li>
 			  <li><a href="#compare" data-toggle="tab">数据比对</a></li>
+			  <li><a href="#randomData" data-toggle="tab">生成随机数据</a></li>
 			</ul>
 
 			<!-- Tab panes -->
 			<div class="tab-content">
-			  <div class="tab-pane active" id="randomData">
-				<h3>文字</h3>
+			  <div class="tab-pane active" id="json">
+			  <div id="sourceEditor" style="width:100%;height:400px"></div>
+				<div class="btn-group btn-group-justified">
+				  <a class="btn btn-default" role="button" id="historyTpl">历史数据模板</a>
+				  <a class="btn btn-default" role="button" id="saveTpl" data-toggle="modal" data-target="#saveFileModal">保存模板</a>
+				  <a class="btn btn-primary" role="button" id="runJson">生成数据</a>
+				  <a class="btn btn-default" role="button" id="clearTpl">清空</a>
+				</div>
+			  </div>
+			  <div class="tab-pane" id="compare">
+			  
+			  <div class="row">
+			  	<div class="col-md-6"><ol id="file1" class="file"></ol></textarea></div>
+			  	<div class="col-md-6"><ol id="file2" class="file"></ol></div>
+			  </div>
+			  
+			  </div>
+			  <div class="tab-pane" id="randomData">
+				<h3>开发中。。。。</h3>
 				  <div class="btn-group btn-group-justified">
 					<div class="input-group">
 						  <input type="text" class="form-control">
@@ -66,23 +74,6 @@
 					<a class="btn btn-default" role="button" data-random-type="single" data-random-data="domain">域名</a>
 					<a class="btn btn-default" role="button" data-random-type="single" data-random-data="email">Email</a>
 				  </div>
-			  
-			  </div>
-			  <div class="tab-pane" id="json">
-			  <div id="sourceEditor" style="width:100%;height:400px"></div>
-				<div class="btn-group btn-group-justified">
-				  <a class="btn btn-default" role="button" id="historyTpl">历史数据模板</a>
-				  <a class="btn btn-default" role="button" id="saveTpl">保存模板</a>
-				  <a class="btn btn-primary" role="button" id="runJson">生成数据</a>
-				  <a class="btn btn-default" role="button" id="clearTpl">清空</a>
-				</div>
-			  </div>
-			  <div class="tab-pane" id="compare">
-			  
-			  <div class="row">
-			  	<div class="col-md-6"><textarea name="" id="file1" cols="40" rows="16"></textarea></div>
-			  	<div class="col-md-6"><textarea name="" id="file2" cols="40" rows="16"></textarea></div>
-			  </div>
 			  
 			  </div>
 			</div>
@@ -138,359 +129,63 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!-- Modal -->
+<div class="modal fade" id="saveFileModal" tabindex="-1" role="dialog" aria-labelledby="saveFileLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="saveFileLabel">请输入要保存的文件名</h4>
+      </div>
+      <div class="modal-body">
+           <div class="input-group">
+		   <input type="text" class="form-control" id="fileName">
+			  <span class="input-group-btn">
+				<button class="btn btn-primary" type="button" id="savefile">保存</button>
+			  </span>
+			</div><!-- /input-group -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="showHistoryTplModal" tabindex="-1" role="dialog" aria-labelledby="showHistoryTplLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="showHistoryTplLabel">这是你保存过的模板文件,双击打开</h4>
+      </div>
+      <div class="modal-body" id="historyFiles">
+	  
+
+      </div>
+      <div class="modal-footer">
+	    <button type="button" class="btn btn-primary" id="loadTpl">加载模板</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="http://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/js/bootstrap.min.js"></script>
-	<script type="text/javascript">
-	var connect = require('connect'), http = require('http'),routeMap = require('./router/index');
 
-
-var ip = require('./config').ip;
-	
-	var app = connect(routeMap)
-		.use(connect.logger('dev'))
-		.use(connect.static('public'))
-		.use(function (req, res) {
-			ip = getClientIp(req);
-			res.end('hello world\n');
-		})
-
-		http.createServer(app).listen(3000);
-		
-	var FileStore = require("file-store")
-    , store = FileStore("dataStored.txt");
-
-	
-	function generateUrl(data) {
-		var urlId = Random.guid();
-		store.set(urlId, data, function (err) {
-			
-			var url =ip+':3000/requireData'+'?uuid='+urlId;
-			$('#generatedUrl').val(url)
-			
-			
-			
-		})
-	}
-	</script>
-
-	<script type="text/javascript" src="js/fileSaver.js"></script>
+<script type="text/javascript" src="js/server.js"></script>
+	<script src="js/fileSaver.js"></script>
 	<script src="js/ZeroClipboard.js"></script>
-	<script type="text/javascript" src="js/jsoneditor.js"></script>
-	<script type="text/javascript">
-	
-	var $document = $(document);
-	//文件另存为
-	
-	$('#myModal').on('shown.bs.modal', function (e) {
-
-		ZeroClipboard.setDefaults({
-			moviePath : 'js/ZeroClipboard.swf'
-		});
-		//剪贴板
-		var clip = new ZeroClipboard($("#copy")[0]);
-		//clip.setText(222)
-		//复制成功：
-		clip.addEventListener("complete", function () {
-			alert("复制成功！");
-		});
-		$document.delegate('#copy', 'click', function () {
-
-			var text = $('#generatedUrl').val();
-			clip.setText(text);
-
-		})
-
-	})
-	
-	var container = document.getElementById("jsoneditor");
-    var editor = new jsoneditor.JSONEditor(container);
-	editor.setMode('code');
-
-
-	var fomattedFlag = false;
-	
-	$document.delegate('#formatJson', 'click', function () {
-
-		if (fomattedFlag) {
-			//已经格式化后，切换到代码方式
-			editor.setMode('code');
-			fomattedFlag = false;
-			$(this).text('格式化')
-
-		} else {
-			var json = editor.getText();
-			try {
-				var jsonObj = JSON.parse(json);
-			} catch (e) {
-				alert('数据格式不合法');
-				return
-			}
-
-			editor.set(jsonObj);
-			editor.setMode('tree')
-			editor.expandAll();
-			fomattedFlag = true;
-			
-			$(this).text('还原');
-
-		}
-
-	})
-	
-	
-	
-	$document.delegate('#export','click',function(){
-	
-	var json = editor.get();
-	var blob = new Blob([JSON.stringify(json)], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "data.json");
-	
-	})
-	
-	
-	$document.delegate('#clear','click',function(){
-	
-	editor.setMode('code');
-	editor.setText('');
-	$('#formatJson').text('格式化');
-	
-	})
-	
-	
-		$document.delegate('#createUrl','click',function(){
-	var data = editor.getText();
-	
-	generateUrl(data);
-	
-	})
-	
-	</script>
-	<script type="text/javascript" src="js/mock.js"></script>
-	<script type="text/javascript">
-	
-	function handle(instance, changeObj) {
-                var tpl;
-                try {
-                    tpl = instance.getText()
-                    tpl = tpl.replace(/^([\r\n]*)/i, '')
-                        .replace(/([\r\n]*$)/i, '')
-                    if (/^\s*[\[\{\(]/.test(tpl)) {
-                        tpl = new Function('return ' + instance.getText());
-                        tpl = tpl()
-                    }
-                } catch (error) {
-                    console.error(error.stack);
-                    tpl = error.toString()
-                }
-                var data = Mock.mock(tpl)
-                editor.set(data);
-                return handle
-            }
-	
-	var sourceContainer = document.getElementById("sourceEditor");
-    var sourceEditor = new jsoneditor.JSONEditor(sourceContainer);
-	sourceEditor.setMode('code');
-    
-	
-	$document.delegate('#runJson','click',function(){
-	
-		handle(sourceEditor);
-	
-	})
-	
-	$document.delegate('#clearTpl','click',function(){
-	
-		 if(confirm("确定要清空数据模板吗？")){
-			sourceEditor.setText('');
-		 }
-	
-	})
-	
-	
-	function generateSingleData(type){
-	
-	
-	
-	
-	}
-	
-	
-	
-	</script>
-	
 	<script src="js/compare.js"></script>
-	<script type="text/javascript">
-	
-	var fileData = {
-	text1:'ababc',
-	text2:'ababd'
-	};
-	
-	//阻止默认滚动
-window.ondragover = function(e) { e.preventDefault(); return false };
-window.ondrop = function(e) { e.preventDefault(); return false };
-	//让jq事件对象支持拖拽
-	$.event.props.push('dataTransfer');
-	
-$('#file1,#file2').on('dragover',function(){
-        $(this).addClass('hover');
-        return false;
-}).on('dragend dragcancel',function(){
-        $(this).removeClass('hover');
-        return false;
-}).on('drop',function(e){
-console.log(e)
-        var files = e.dataTransfer.files,
-                $this = $(this);
-
-					
-        $.each(files,function(index,file){
-
-                var reader = new FileReader();
-
-                reader.onload = function(e){
-
-                        if(files.length >= 2){
-
-                                fileData['text'+(index+1)] = e.target.result;
-
-                        }else{
-                                if($this.is('#file1')){
-                                        fileData.text1 = e.target.result;
-                                       // $('#fileInfo1').text(file.path);
-                                }else{
-                                        fileData.text2 = e.target.result;
-                                      //  $('#fileInfo2').text(file.path);
-                                }
-                        }
-
-                        doDiff(fileData.text1,fileData.text2);
-
-
-                }
-
-                reader.readAsText(file,'utf8');
-
-        });
-
-
-        return false;
-});
-
-	
-	function doDiff(text1,text2){
-
-        var lines1 = text1.split('\n');
-        var lines2 = text2.split('\n');
-
-        var editedLines1=[],editedLines2=[];
-
-        var linesEditProgress = getEditProgress(lines1,lines2);
-
-        linesEditProgress.forEach(function(progressItem){
-
-                switch(progressItem.type){
-
-                        case 'copy':
-
-                                editedLines1[progressItem.position1]={
-                                        class:"copy",
-                                        text:progressItem.target1
-                                };
-                                editedLines2[progressItem.position2]={
-                                        class:"copy",
-                                        text:progressItem.target2
-                                };
-
-                                break;
-
-                        case 'replace':
-
-                                editedLines1[progressItem.position1]={
-                                        class:"replace",
-                                        text:progressItem.target1
-                                };
-                                editedLines2[progressItem.position2]={
-                                        class:"replace",
-                                        text:progressItem.target2
-                                };
-
-                                break;
-
-                        case 'delete':
-
-                                editedLines1[progressItem.position1]={
-                                        class:"delete",
-                                        text:progressItem.target1
-                                };
-                                editedLines2[progressItem.position2]={
-                                        class:editedLines2[progressItem.position2] && editedLines2[progressItem.position2].class || "copy",
-                                        text:(editedLines2[progressItem.position2] && editedLines2[progressItem.position2].text || progressItem.target2)
-                                                         + '<br />'
-                                };
-                                
-
-                                break;
-
-                        case 'insert':
-
-                                editedLines1[progressItem.position1]={
-                                        class:editedLines1[progressItem.position1] && editedLines1[progressItem.position1].class || "copy",
-                                        text:(editedLines1[progressItem.position1] && editedLines1[progressItem.position1].text || progressItem.target1)
-                                                         + '<br />'
-                                };
-
-                                editedLines2[progressItem.position2]={
-                                        class:"insert",
-                                        text:progressItem.target2
-                                };
-
-                                break;
-                }
-
-        });
-
-        showFileContent(editedLines1,editedLines2);
-
-}
-
-function showFileContent(file1,file2){
-
-        if(typeof file1 === 'string'){
-                file1 = file1.split('\n');
-        }
-        if(typeof file2 === 'string'){
-                file2 = file2.split('\n');
-        }
-
-        if(file1){
-
-                $('#file1').html(file1.map(mapStyledLines).join(''));
-
-        }
-
-        if(file2){
-
-                $('#file2').html(file2.map(mapStyledLines).join(''));
-                
-        }
-
-        function mapStyledLines(editedLine){
-
-                if(typeof editedLine === 'object'){
-                        return '<li class="' + editedLine.class + '"><span>' + editedLine.text.replace(/<br ?\/?>/g,'_@@br@@_').replace(/</g,'&lt;').replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;').replace(/_@@br@@_/g,'</span><br /><span class="blank">') + '</span></li>';
-                }else{
-                        return editedLine;
-                }
-
-        }
-}
-
-	
-	
-	
-	</script>
+	<script src="js/jsoneditor.js"></script>
+	<script type="text/javascript" src="js/mock.js"></script>
+	<script type="text/javascript" src="js/juicer-min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
   </body>
 </html>

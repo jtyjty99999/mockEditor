@@ -1,0 +1,83 @@
+	.container{
+	
+	margin-top:20px
+	
+	}
+	
+.file{
+        -webkit-app-region:no-drag;
+        width:-webkit-calc(100% - 5px);
+        float:left;
+        margin:5px;
+        background:#eee;
+        border:1px solid #ccc;
+        overflow: auto;
+        white-space: nowrap;
+        height:400px;
+        font-size:14px;
+        list-style-position: outside;
+        padding-left:50px;
+        -webkit-user-select:text;
+}
+
+.file li{
+        color:#aaa;
+        font-family: Courier;
+}
+
+.file li span{
+        line-height: 1.5em;
+        margin: 0.1em;
+        display: inline-block;
+        color:#333;
+}
+
+.file .copy span{
+
+}
+
+.file .replace span{
+
+        background: rgb(182,221,255);
+
+}
+
+.file .insert span{
+
+        background: rgb(204,235,204);
+        margin-left: -8px;
+
+}
+.file .insert::before{
+
+        position: relative;
+        color:#5a5;
+        left:-12px;
+        content:'+';
+
+}
+
+.file .delete span{
+
+        background: rgb(235,204,204);
+        margin-left: -8px;
+
+}
+.file .delete::before{
+
+        position: relative;
+        color:#a55;
+        left:-12px;
+        content:'-';
+
+}
+
+.file span.blank{
+        height:1.5em;
+        vertical-align: top;
+}
+
+.fileList:hover{
+background-color: #e5e3e9;
+border-right: 1px solid #dbd8e0;
+}
