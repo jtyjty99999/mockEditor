@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="http://cdn.bootcss.com/twitter-bootstrap/3.0.3/css/bootstrap.min.css">
-
+    <link rel="stylesheet" type="text/css" href="css/jsoneditor.css">
+	
+	<style type="text/css">
+	
+	
+	
+	
+	</style>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -57,7 +64,7 @@
 	  
 	  
 	<div class="row">
-		<div class="col-md-8">
+		<div class="col-md-7">
 			<div class="panel panel-success">
 			  <div class="panel-body">
 				这里可以生成各种随机数据 
@@ -98,8 +105,8 @@
 			  <div class="tab-pane" id="compare">
 			  
 			  <div class="row">
-			  	<div class="col-md-6"><textarea name="" id="" cols="45" rows="16"></textarea></div>
-			  	<div class="col-md-6"><textarea name="" id="" cols="45" rows="16"></textarea></div>
+			  	<div class="col-md-6"><textarea name="" id="file1" cols="40" rows="16"></textarea></div>
+			  	<div class="col-md-6"><textarea name="" id="file2" cols="40" rows="16"></textarea></div>
 			  </div>
 			  
 			  </div>
@@ -110,18 +117,19 @@
 		
 		
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-5">
 			<div class="panel panel-success">
 				  <div class="panel-body">
 					数据结果 
 				  </div>
 				  <div class="panel-footer">
 				  
-				  <textarea name="" id="result" cols="30" rows="10"></textarea>
-				  <div class="btn-group">
-				  <button type="button" class="btn btn-default" id="export">导出成json文件</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">生成url</button>
-				  <button type="button" class="btn btn-default">清空</button>
+				  <div id="jsoneditor" style="width: 100%; height: 400px;"></div>
+				  <div class="btn-group btn-group-justified">
+				  <a class="btn btn-default" role="button" id="export">导出json</a>
+				  <a class="btn btn-default" role="button" data-toggle="modal" data-target="#myModal">生成url</a>
+				  <a class="btn btn-default" role="button" id="formatJson">格式化</a>
+				  <a class="btn btn-default" role="button" id="clear">清空</a>
 				</div>
 				  </div>
 			</div>
@@ -177,17 +185,11 @@
 
 	<script type="text/javascript" src="js/fileSaver.js"></script>
 	<script src="js/ZeroClipboard.js"></script>
+	<script type="text/javascript" src="js/jsoneditor.js"></script>
 	<script type="text/javascript">
 	
 	var $document = $(document);
 	//文件另存为
-	$document.delegate('#export','click',function(){
-	
-	var text = $('#result').val();
-	var blob = new Blob([text], {type: "text/plain;charset=utf-8"});
-	saveAs(blob, "data.json");
-	
-	})
 	
 	$('#myModal').on('shown.bs.modal', function (e) {
 
@@ -210,8 +212,233 @@
 
 	})
 	
-	
+	var container = document.getElementById("jsoneditor");
+    var editor = new jsoneditor.JSONEditor(container);
+	editor.setMode('code');
 
+
+	var fomattedFlag = false;
+	
+	$document.delegate('#formatJson', 'click', function () {
+
+		if (fomattedFlag) {
+			//已经格式化后，切换到代码方式
+			editor.setMode('code');
+			fomattedFlag = false;
+			$(this).text('格式化')
+
+		} else {
+			var json = editor.getText();
+			try {
+				var jsonObj = JSON.parse(json);
+			} catch (e) {
+				alert('数据格式不合法');
+				return
+			}
+
+			editor.set(jsonObj);
+			editor.setMode('tree')
+			editor.expandAll();
+			fomattedFlag = true;
+			
+			$(this).text('还原');
+
+		}
+
+	})
+	
+	
+	
+	$document.delegate('#export','click',function(){
+	
+	var json = editor.get();
+	var blob = new Blob([JSON.stringify(json)], {type: "text/plain;charset=utf-8"});
+	saveAs(blob, "data.json");
+	
+	})
+	
+	
+	$document.delegate('#clear','click',function(){
+	
+	editor.setMode('code');
+	editor.setText('');
+	$('#formatJson').text('格式化');
+	
+	})
+	
+	
+	</script>
+	<script src="js/compare.js"></script>
+	<script type="text/javascript">
+	
+	var fileData = {
+	text1:'ababc',
+	text2:'ababd'
+	};
+	
+	//阻止默认滚动
+window.ondragover = function(e) { e.preventDefault(); return false };
+window.ondrop = function(e) { e.preventDefault(); return false };
+	//让jq事件对象支持拖拽
+	$.event.props.push('dataTransfer');
+	
+$('#file1,#file2').on('dragover',function(){
+        $(this).addClass('hover');
+        return false;
+}).on('dragend dragcancel',function(){
+        $(this).removeClass('hover');
+        return false;
+}).on('drop',function(e){
+console.log(e)
+        var files = e.dataTransfer.files,
+                $this = $(this);
+
+					
+        $.each(files,function(index,file){
+
+                var reader = new FileReader();
+
+                reader.onload = function(e){
+
+                        if(files.length >= 2){
+
+                                fileData['text'+(index+1)] = e.target.result;
+
+                        }else{
+                                if($this.is('#file1')){
+                                        fileData.text1 = e.target.result;
+                                       // $('#fileInfo1').text(file.path);
+                                }else{
+                                        fileData.text2 = e.target.result;
+                                      //  $('#fileInfo2').text(file.path);
+                                }
+                        }
+
+                        doDiff(fileData.text1,fileData.text2);
+
+
+                }
+
+                reader.readAsText(file,'utf8');
+
+        });
+
+
+        return false;
+});
+
+	
+	function doDiff(text1,text2){
+
+        var lines1 = text1.split('\n');
+        var lines2 = text2.split('\n');
+
+        var editedLines1=[],editedLines2=[];
+
+        var linesEditProgress = getEditProgress(lines1,lines2);
+
+        linesEditProgress.forEach(function(progressItem){
+
+                switch(progressItem.type){
+
+                        case 'copy':
+
+                                editedLines1[progressItem.position1]={
+                                        class:"copy",
+                                        text:progressItem.target1
+                                };
+                                editedLines2[progressItem.position2]={
+                                        class:"copy",
+                                        text:progressItem.target2
+                                };
+
+                                break;
+
+                        case 'replace':
+
+                                editedLines1[progressItem.position1]={
+                                        class:"replace",
+                                        text:progressItem.target1
+                                };
+                                editedLines2[progressItem.position2]={
+                                        class:"replace",
+                                        text:progressItem.target2
+                                };
+
+                                break;
+
+                        case 'delete':
+
+                                editedLines1[progressItem.position1]={
+                                        class:"delete",
+                                        text:progressItem.target1
+                                };
+                                editedLines2[progressItem.position2]={
+                                        class:editedLines2[progressItem.position2] && editedLines2[progressItem.position2].class || "copy",
+                                        text:(editedLines2[progressItem.position2] && editedLines2[progressItem.position2].text || progressItem.target2)
+                                                         + '<br />'
+                                };
+                                
+
+                                break;
+
+                        case 'insert':
+
+                                editedLines1[progressItem.position1]={
+                                        class:editedLines1[progressItem.position1] && editedLines1[progressItem.position1].class || "copy",
+                                        text:(editedLines1[progressItem.position1] && editedLines1[progressItem.position1].text || progressItem.target1)
+                                                         + '<br />'
+                                };
+
+                                editedLines2[progressItem.position2]={
+                                        class:"insert",
+                                        text:progressItem.target2
+                                };
+
+                                break;
+                }
+
+        });
+
+        showFileContent(editedLines1,editedLines2);
+
+}
+
+function showFileContent(file1,file2){
+
+        if(typeof file1 === 'string'){
+                file1 = file1.split('\n');
+        }
+        if(typeof file2 === 'string'){
+                file2 = file2.split('\n');
+        }
+
+        if(file1){
+
+                $('#file1').html(file1.map(mapStyledLines).join(''));
+
+        }
+
+        if(file2){
+
+                $('#file2').html(file2.map(mapStyledLines).join(''));
+                
+        }
+
+        function mapStyledLines(editedLine){
+
+                if(typeof editedLine === 'object'){
+                        return '<li class="' + editedLine.class + '"><span>' + editedLine.text.replace(/<br ?\/?>/g,'_@@br@@_').replace(/</g,'&lt;').replace(/ /g,'&nbsp;').replace(/\t/g,'&nbsp;&nbsp;&nbsp;&nbsp;').replace(/_@@br@@_/g,'</span><br /><span class="blank">') + '</span></li>';
+                }else{
+                        return editedLine;
+                }
+
+        }
+}
+
+	
+	
+	
 	</script>
   </body>
 </html>
